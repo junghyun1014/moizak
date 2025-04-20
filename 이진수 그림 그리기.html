@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이진수 색칠 게임</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .puzzle {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 40px;
+      align-items: center;
+      justify-content: center;
+    }
+    table {
+      border-collapse: collapse;
+    }
+    td {
+      width: 25px;
+      height: 25px;
+      border: 1px solid #999;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .hint td {
+      background-color: #f0f0f0;
+      font-size: 14px;
+    }
+    .draw td {
+      cursor: pointer;
+    }
+    .filled {
+      background-color: #4CAF50 !important;
+    }
+    .button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 15px;
+    }
+    .result {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 이진수 색칠 게임</h1>
+  <p style="text-align:center;">힌트를 보고 오른쪽 격자를 색칠해보세요. 무엇이 나올까요?</p>
+
+  <div id="gameArea"></div>
+
+  <script>
+    const puzzles = [
+      [
+        [0,0,0,0,0,1,1,1,0,0],
+        [0,0,0,0,1,0,1,1,0,0],
+        [0,0,0,0,1,1,0,1,0,0],
+        [1,0,0,1,1,1,1,0,0,0],
+        [1,0,1,1,1,0,0,0,1,1],
+        [1,1,1,1,1,1,1,1,1,0],
+        [0,0,1,1,1,0,0,0,0,0],
+        [1,0,0,1,1,0,0,0,0,0],
+        [0,1,0,1,1,1,0,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1]
+      ],
+      [
+        [0,0,0,1,1,1,1,0,0,0],
+        [0,0,1,1,1,1,0,1,0,0],
+        [0,1,1,1,1,1,1,1,1,0],
+        [1,0,1,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,0,1,1],
+        [1,1,1,1,1,0,1,1,1,1],
+        [0,1,1,1,1,1,1,1,1,0],
+        [0,0,0,1,1,1,1,0,0,0],
+        [0,0,0,1,1,1,1,0,0,0],
+        [0,0,0,1,1,1,1,0,0,0]
+      ],
+      [
+        [1,0,0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0,0,0],
+        [0,1,1,1,0,1,1,1,0,0],
+        [0,0,1,1,1,1,0,1,0,0],
+        [0,0,0,1,1,1,1,1,0,0],
+        [0,1,1,1,1,1,1,0,0,0],
+        [0,1,0,1,0,1,1,1,0,0],
+        [0,1,1,1,0,0,1,1,1,1],
+        [0,0,0,0,0,0,0,1,0,1],
+        [0,0,0,0,0,0,0,1,1,1]
+      ]
+    ];
+
+    const gameArea = document.getElementById("gameArea");
+
+    puzzles.forEach((puzzle, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "puzzle";
+
+      const hintTable = document.createElement("table");
+      hintTable.className = "hint";
+      puzzle.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        hintTable.appendChild(tr);
+      });
+
+      const drawTable = document.createElement("table");
+      drawTable.className = "draw";
+      drawTable.dataset.index = index;
+
+      puzzle.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        row.forEach((_, j) => {
+          const td = document.createElement("td");
+          td.dataset.row = i;
+          td.dataset.col = j;
+          td.addEventListener("click", () => {
+            td.classList.toggle("filled");
+          });
+          tr.appendChild(td);
+        });
+        drawTable.appendChild(tr);
+      });
+
+      const button = document.createElement("button");
+      button.className = "button";
+      button.textContent = "정답 확인";
+
+      const result = document.createElement("p");
+      result.className = "result";
+
+      button.onclick = () => {
+        const cells = drawTable.querySelectorAll("td");
+        let correct = true;
+        cells.forEach(cell => {
+          const row = parseInt(cell.dataset.row);
+          const col = parseInt(cell.dataset.col);
+          const shouldBeFilled = puzzle[row][col] === 1;
+          const isFilled = cell.classList.contains("filled");
+          if (shouldBeFilled !== isFilled) {
+            correct = false;
+          }
+        });
+        result.textContent = correct
+          ? "🎉 정답입니다! 완벽해요!"
+          : "❌ 아직 틀린 부분이 있어요.";
+        result.style.color = correct ? "green" : "red";
+      };
+
+      wrapper.appendChild(hintTable);
+      wrapper.appendChild(drawTable);
+
+      const section = document.createElement("div");
+      section.appendChild(wrapper);
+      section.appendChild(button);
+      section.appendChild(result);
+      gameArea.appendChild(section);
+    });
+  </script>
+
+</body>
+</html>
